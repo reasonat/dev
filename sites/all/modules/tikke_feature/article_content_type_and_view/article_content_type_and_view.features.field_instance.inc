@@ -87,6 +87,49 @@ function article_content_type_and_view_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-article-field_boolean'
+  $field_instances['node-article-field_boolean'] = array(
+    'bundle' => 'article',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 12,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_boolean',
+    'label' => 'boolean',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 0,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 1,
+    ),
+  );
+
   // Exported field_instance: 'node-article-field_image'
   $field_instances['node-article-field_image'] = array(
     'bundle' => 'article',
@@ -228,6 +271,7 @@ function article_content_type_and_view_field_default_field_instances() {
   t('Image');
   t('Tags');
   t('Upload an image to go with this article.');
+  t('boolean');
   t('text');
 
   return $field_instances;

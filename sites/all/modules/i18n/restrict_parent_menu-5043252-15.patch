@@ -1,0 +1,65 @@
+diff --git a/i18n_menu/i18n_menu.module b/i18n_menu/i18n_menu.module
+index 8f91fc5..c4a40f1 100644
+--- a/i18n_menu/i18n_menu.module
++++ b/i18n_menu/i18n_menu.module
+@@ -785,6 +785,36 @@ function i18n_menu_form_node_form_alter(&$form, &$form_state, $form_id) {
+   if (isset($form['menu'])) {
+     $node = $form['#node'];
+     $link = $node->menu;
++    // Save current language to restore it later.
++    global $language;
++    global $language_content;
++    $cached_language = $language;
++
++    if (isset($form['language'])) {
++      // Temporarily change language to get the right menu options.
++      $default_language = isset($node->language) ? $node->language : $form['language']['#default_value'];
++      $i18n_langcode = empty($form_state['values']['language']) ? $default_language : $form_state['values']['language'];
++      if($i18n_langcode != LANGUAGE_NONE){
++        $langs = language_list();
++        $language_content = $langs[$i18n_langcode];
++        $language = $langs[$i18n_langcode];
++      }
++      // Define defaults and options based on the language.
++      $type = $form['#node']->type;
++      $default_menu = ($link['mlid'] ? $link['menu_name'] . ':' . $link['plid'] : variable_get('menu_parent_' . $type, 'main-menu:0'));
++      $options = menu_parent_options(menu_get_menus(), $type);
++      // Modify the menu link parent options.
++      $form['menu']['link']['parent']['#options'] = $options;
++      $form['menu']['link']['parent']['#default_value'] = $default_menu;
++      $form['menu']['link']['parent']['#prefix'] = '<div id="language-input-ajax-wrapper">';
++      $form['menu']['link']['parent']['#suffix'] = '</div>';
++      // Adds ajax callback to the language select input.
++      $form['language']['#ajax'] = array(
++        'callback' => '_i18n_menu_language_ajax_callback',
++        'wrapper' => 'language-input-ajax-wrapper',
++      );
++    }
++
+     if (!empty($link['mlid'])) {
+       // Preserve the menu item language whatever it is.
+       $form['menu']['link']['language'] = array('#type' => 'value', '#value' => $link['language']);
+@@ -798,6 +828,9 @@ function i18n_menu_form_node_form_alter(&$form, &$form_state, $form_id) {
+     }
+     // Customized must be set to 1 to save language.
+     $form['menu']['link']['customized'] = array('#type' => 'value', '#value' => 1);
++
++    // Redefine language.
++    $language = $cached_language;
+   }
+ }
+ 
+@@ -821,6 +854,13 @@ function i18n_menu_item_get_node($item) {
+ }
+ 
+ /**
++ * Callback for node language select changes.
++ */
++function _i18n_menu_language_ajax_callback($form, $form_state) {
++  return $form['menu']['link']['parent'];
++}
++
++/**
+  * Implements hook_node_presave()
+  *
+  * Set menu link language to node language
